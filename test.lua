@@ -106,54 +106,70 @@ for L = 1,checkpoint.opt.num_layers do
 end
 state_size = #current_state
 
--- do a few seeded timesteps
-local seed_text = opt.primetext
-if string.len(seed_text) > 0 then
-    gprint('seeding with ' .. seed_text)
-    gprint('--------------------------')
-    for c in seed_text:gmatch'.' do
-        prev_char = torch.Tensor{vocab[c]}
-        io.write(ivocab[prev_char[1]])
-        if opt.gpuid >= 0 and opt.opencl == 0 then prev_char = prev_char:cuda() end
-        if opt.gpuid >= 0 and opt.opencl == 1 then prev_char = prev_char:cl() end
-        local lst = protos.rnn:forward{prev_char, unpack(current_state)}
-        -- lst is a list of [state1,state2,..stateN,output]. We want everything but last piece
-        current_state = {}
-        for i=1,state_size do table.insert(current_state, lst[i]) end
-        prediction = lst[#lst] -- last element holds the log probabilities
-    end
+-- set input/output paths
+local input_file = path.join(opt.data_dir, 'input.txt')
+local label_file = path.join(opt.data_dir, 'labels.txt')
+local input_tensorFile = path.join(opt.data_dir, 'data.t7')
+local output_file = path.join(opt.out_dir, 'predictions.txt')
+
+-- fetch file attributes to determine if we need to rerun preprocessing
+local run_prepro = false
+if not (path.exists(input_tensorFile)) then
+    -- prepro files do not exist, generate them
+    print('data.t7 does not exist. Running preprocessing...')
+    run_prepro = true
 else
-    -- fill with uniform probabilities over characters (? hmm)
-    gprint('missing seed text, using uniform probability over first character')
-    gprint('--------------------------')
-    prediction = torch.Tensor(1, #ivocab):fill(1)/(#ivocab)
-    if opt.gpuid >= 0 and opt.opencl == 0 then prediction = prediction:cuda() end
-    if opt.gpuid >= 0 and opt.opencl == 1 then prediction = prediction:cl() end
-end
-
--- start sampling/argmaxing
-for i=1, opt.length do
-
-    -- log probabilities from the previous timestep
-    if opt.sample == 0 then
-        -- use argmax
-        local _, prev_char_ = prediction:max(2)
-        prev_char = prev_char_:resize(1)
-    else
-        -- use sampling
-        prediction:div(opt.temperature) -- scale by temperature
-        local probs = torch.exp(prediction):squeeze()
-        probs:div(torch.sum(probs)) -- renormalize so probs sum to one
-        prev_char = torch.multinomial(probs:float(), 1):resize(1):float()
+    -- check if the input file was modified since last time we 
+    -- ran the prepro. if so, we have to rerun the preprocessing
+    local input_attr = lfs.attributes(input_file)
+    local tensor_attr = lfs.attributes(input_tensorFile)
+    if input_attr.modification > tensor_attr.modification then
+        print('data.t7 detected as stale. Re-running preprocessing...')
+        run_prepro = true
     end
-
-    -- forward the rnn for next character
-    local lst = protos.rnn:forward{prev_char, unpack(current_state)}
-    current_state = {}
-    for i=1,state_size do table.insert(current_state, lst[i]) end
-    prediction = lst[#lst] -- last element holds the log probabilities
-
-    io.write(ivocab[prev_char[1]])
 end
-io.write('\n') io.flush()
+if run_prepro then
+    -- construct a tensor with all the data by making use of loader class function: text_to_tensor
+    print('one-time setup: preprocessing input text file ' .. input_file .. '...')
+    CharSplitLMMinibatchLoader.text_to_tensor(input_file, nil, input_tensorFile, label_file, vocab)
+end
+
+--[[
+STOPPED DEVELOPING HERE... REALIZED 'train.lua' COULD BE USED TO TEST EVEN WHEN
+USING 2 DATASETS.  JUST LOAD CHECKPOINT FROM DATASET 1, AND SPECIFY TEST FRACTION
+FOR DATASET 2
+]]
+
+-- load the input tensor
+local input = torch.load(input_tensorFile)
+-- put into left, top, width, height format
+input[{{3},{}}] = input[{{3},{}}] - input[{{1},{}}] + 1
+input[{{4},{}}] = input[{{4},{}}] - input[{{4},{}}] + 1
+
+print('writing predictions to ' .. output_txtFile)
+-- open output file
+file = torch.DiskFile(output_txtFile, 'w')
+file:writeString(tostring(opt.frames)..' \n')
+
+-- loop through input bounding boxes to make predictions at each time step
+local prediction	-- localize prediction to main chunk
+for f = 1, seq_length - opt.frames do
+	
+	-- do forward pass with input for frame i
+	prediction = forwardPass(input[{{},{f}}]:t())
+
+	-- if predicting more than 1 frame propagate prediction through the next 'frames' time steps
+	if opt.frames > 1 then
+		for i = 1, opt.frames-1 do prediction = forwardPass(prediction) end
+	end
+
+	-- write the prediction to txt file
+	s = tostring(prediction)
+	last = s:find('\n') - 1
+	for element in s:sub(2,last):gmatch'%S+' do file:writeString(element..' ') end
+	file:writeString('\n')
+
+end
+
+file:close()
 

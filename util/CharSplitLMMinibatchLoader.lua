@@ -36,23 +36,30 @@ function CharSplitLMMinibatchLoader.create(data_dir, batch_size, seq_length, spl
     if run_prepro then
         -- construct a tensor with all the data, and vocab file
         print('one-time setup: preprocessing input text file ' .. input_file .. '...')
-        CharSplitLMMinibatchLoader.text_to_tensor(input_file, vocab_file, tensor_file)
+        CharSplitLMMinibatchLoader.text_to_tensor(input_file, vocab_file, tensor_file, label_file)
     end
 
     print('loading data files...')
-    local data = torch.load(tensor_file)
+    local tensors = torch.load(tensor_file)
+	local data = tensors[1]
+	local ydata = tensors[2]
     self.vocab_mapping = torch.load(vocab_file)
 
     -- cut off the end so that it divides evenly
     local len = data:size(1)
     if len % (batch_size * seq_length) ~= 0 then
         print('cutting off end of data so that the batches/sequences divide evenly')
-        data = data:sub(1, batch_size * seq_length 
+        tmp_data = data:sub(1, batch_size * seq_length 
                     * math.floor(len / (batch_size * seq_length)))
+		tmp_ydata = ydata:sub(1, batch_size * seq_length 
+                    * math.floor(len / (batch_size * seq_length)))
+		data = tmp_data:clone()
+		ydata = tmp_ydata:clone()
     end
 
     -- count vocab
     self.vocab_size = 0
+	self.output_size = 2	-- hard coded for coding or noncoding labels
     for _ in pairs(self.vocab_mapping) do 
         self.vocab_size = self.vocab_size + 1 
     end
@@ -62,9 +69,6 @@ function CharSplitLMMinibatchLoader.create(data_dir, batch_size, seq_length, spl
     self.batch_size = batch_size
     self.seq_length = seq_length
 
-    local ydata = data:clone()
-    ydata:sub(1,-2):copy(data:sub(2,-1))
-    ydata[-1] = data[1]
     self.x_batches = data:view(batch_size, -1):split(seq_length, 2)  -- #rows = #batches
     self.nbatches = #self.x_batches
     self.y_batches = ydata:view(batch_size, -1):split(seq_length, 2)  -- #rows = #batches
@@ -124,24 +128,31 @@ function CharSplitLMMinibatchLoader:next_batch(split_index)
 end
 
 -- *** STATIC method ***
-function CharSplitLMMinibatchLoader.text_to_tensor(in_textfile, out_vocabfile, out_tensorfile, label_file)  -- TODO: convert label_file to tensors label
+function CharSplitLMMinibatchLoader.text_to_tensor(in_textfile, out_vocabfile, out_tensorfile, label_file, cp_mapping)
     local timer = torch.Timer()
 
     print('loading text file...')
     --local cache_len = 10000
     local rawdata
     local tot_len = 0
-    f = io.open(in_textfile, "r")
     -- find the number of genes in the dataset
-    for line in f:lines() do tot_len = tot_len + 1 end
+	fd = io.open(in_textfile)
+    for line in fd:lines() do tot_len = tot_len + 1 end
+	fd:close()
 
-    -- create vocabulary if it doesn't exist yet
-    print('creating vocabulary mapping...')
-    -- creat manually since there are only four characters
-    vocab_mapping['A'] = 1
-    vocab_mapping['C'] = 2
-    vocab_mapping['G'] = 3
-    vocab_mapping['T'] = 4
+	if out_vocabfile == nil then
+		-- set vocab to checkpoint mapping
+		vocab_mapping = cp_mapping
+	else
+		-- create vocabulary if it doesn't exist yet
+		print('creating vocabulary mapping...')
+		-- creat manually since there are only four characters
+		vocab_mapping = {}
+		vocab_mapping['A'] = 1
+		vocab_mapping['C'] = 2
+		vocab_mapping['G'] = 3
+		vocab_mapping['T'] = 4
+	end
 
     --[[
     -- record all characters to a set
@@ -169,25 +180,40 @@ function CharSplitLMMinibatchLoader.text_to_tensor(in_textfile, out_vocabfile, o
     -- construct a tensor with all the data
     print('putting data into tensor...')
     local data = torch.ByteTensor(tot_len) -- store it into 1D first, then rearrange
+	local labels = torch.ByteTensor(tot_len) -- also store labels as 1D tensor
     --f = io.open(in_textfile, "r")
     local currlen = 0
     --rawdata = f:read(cache_len)
-    rawdata = f:read('*l')
+	fd = io.open(in_textfile)
+	fl = io.open(label_file)
+    rawdata = fd:read('*l')
+	rawlabel = fl:read('*l')
+	--exclude space at the end of lines
+	rawdata = rawdata:sub(1,-2)
+	rawlabel = rawlabel:sub(1,-2)
     repeat
         for i=1, #rawdata do
             data[currlen+i] = vocab_mapping[rawdata:sub(i, i)] -- lua has no string indexing using []
+			labels[currlen+i] = rawlabel:sub(i,i)
         end
         currlen = currlen + #rawdata
         --rawdata = f:read(cache_len)
-        rawdata = f:read('*l')
+        rawdata = fd:read('*l')
+		rawlabel = fl:read('*l')
+		--exclude space at the end of lines
+		rawdata = rawdata:sub(1,-2)
+		rawlabel = rawlabel:sub(1,-2)
     until not rawdata
-    f:close()
+    fd:close()
+	fl:close()
 
     -- save output preprocessed files
-    print('saving ' .. out_vocabfile)
-    torch.save(out_vocabfile, vocab_mapping)
+	if not out_vocabfile == nil then
+	    print('saving ' .. out_vocabfile)
+	    torch.save(out_vocabfile, vocab_mapping)
+	end
     print('saving ' .. out_tensorfile)
-    torch.save(out_tensorfile, data)
+    torch.save(out_tensorfile, {data,labels})
 end
 
 return CharSplitLMMinibatchLoader

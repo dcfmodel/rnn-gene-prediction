@@ -1,0 +1,97 @@
+LOCUS       NC_000854            1669696 bp    DNA     circular CON 17-DEC-2014
+DEFINITION  Aeropyrum pernix K1, complete genome.
+ACCESSION   NC_000854
+VERSION     NC_000854.2  GI:118430835
+DBLINK      BioProject: PRJNA57757
+KEYWORDS    RefSeq.
+SOURCE      Aeropyrum pernix K1
+  ORGANISM  Aeropyrum pernix K1
+            Archaea; Crenarchaeota; Thermoprotei; Desulfurococcales;
+            Desulfurococcaceae; Aeropyrum.
+REFERENCE   1
+  AUTHORS   Yamazaki,S., Yamazaki,J., Nishijima,K., Otsuka,R., Mise,M.,
+            Ishikawa,H., Sasaki,K., Tago,S. and Isono,K.
+  TITLE     Proteome analysis of an aerobic hyperthermophilic crenarchaeon,
+            Aeropyrum pernix K1
+  JOURNAL   Mol. Cell Proteomics 5 (5), 811-823 (2006)
+   PUBMED   16455681
+REFERENCE   2
+  AUTHORS   Yamazaki,S., Kikuchi,H. and Kawarabayasi,Y.
+  TITLE     Characterization of a Whole Set of tRNA Molecules in an Aerobic
+            Hyper-thermophilic Crenarchaeon, Aeropyrum pernix K1
+  JOURNAL   DNA Res. 12 (6), 403-416 (2005)
+   PUBMED   16769697
+REFERENCE   3
+  AUTHORS   Kawarabayasi,Y., Hino,Y., Horikawa,H., Yamazaki,S., Haikawa,Y.,
+            Jin-no,K., Takahashi,M., Sekine,M., Baba,S., Ankai,A., Kosugi,H.,
+            Hosoyama,A., Fukui,S., Nagai,Y., Nishijima,K., Nakazawa,H.,
+            Takamiya,M., Masuda,S., Funahashi,T., Tanaka,T., Kudoh,Y.,
+            Yamazaki,J., Kushida,N., Oguchi,A., Aoki,K., Kubota,K.,
+            Nakamura,Y., Nomura,N., Sako,Y. and Kikuchi,H.
+  TITLE     Complete genome sequence of an aerobic hyper-thermophilic
+            crenarchaeon, Aeropyrum pernix K1
+  JOURNAL   DNA Res. 6 (2), 83-101 (1999)
+   PUBMED   10382966
+REFERENCE   4  (bases 1 to 1669696)
+  CONSRTM   NCBI Genome Project
+  TITLE     Direct Submission
+  JOURNAL   Submitted (28-NOV-2006) National Center for Biotechnology
+            Information, NIH, Bethesda, MD 20894, USA
+REFERENCE   5  (bases 1 to 1669696)
+  AUTHORS   Tanaka,T., Hino,Y., Kawarabayasi,Y., Kikuchi,H., Tajima,T.,
+            Sekigawa,T., Oguchi,A., Yamazaki,S., Tanikawa,S., Fujita,N. and
+            Harayama,S.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (14-DEC-1998) Director-General of Department of
+            Biotechnology, National Institute of Technology and Evaluation
+            (NITE), NITE Genome Analysis Center (NGAC), Department of
+            Biotechnology; 2-49-10 Nishihara, Shibuya-ku, Tokyo 151-0066, Japan
+            (E-mail:bio@nite.go.jp, URL:http://www.bio.nite.go.jp/,
+            Tel:81-3-3481-1933, Fax:81-3-3481-8424)
+COMMENT     PROVISIONAL REFSEQ: This record has not yet been subject to final
+            NCBI review. The reference sequence was derived from BA000002.
+            On Nov 28, 2006 this sequence version replaced gi:14600379.
+            Kawarabayasi, Y. is at National Institute of Advanced Industrial
+            Science and Technology (AIST), Tsukuba, Ibaraki 305-8566, Japan.
+            Tanaka, T., Hino, Y., Kawarabayasi, Y. and Kikuchi, H. are original
+            submitters.
+            Tajima, T., Sekigawa, T., Oguchi, A., Yamazaki, S., Tanikawa, S.,
+            Fujita, N. and Harayama S. submitted a revised version of the
+            genomic sequence with a single bp insertion and the result of
+            reannotation.
+            The genome of A. pernix was completely re-annotated in May 2006.
+            Single nucleotide was inserted at position 941,216. Some ORFs were
+            added or modified according to the result of proteome analysis at
+            NITE (Yamazaki, S. et al., Mol Cell Proteomics. 5, 811-823 (2006)).
+            The detailed process of re-annotation is described in
+            http://www.bio.nite.go.jp/dogan/GeneralFeature?GENOME_ID=ape_G1.
+            All locus tags of A. pernix were replaced to new identifiers by the
+            following rules.
+            1. Prefix 'APE' or 'APES' was replaced by 'APE_'.
+            2. ORF numbers were inherited except for those with previous locus
+            tag starting with 'APES'.
+            3. An alphabetical character like 'a' was added after the ORF
+            number where new ORF was inserted between existing ORFs, including
+            those with previous locus tag starting with 'APES'. 4. Version
+            number like '.1' was added where the start position of existing ORF
+            was changed.
+            Please visit our web site.
+            URL:http://www.bio.nite.go.jp/e/
+            DOGAN ; Database of the Genomes Analyzed at NITE
+            The database contains genome sequence data, physical maps and the
+            genomic and proteomic data of the microorganisms analyzed.
+            URL:http://www.bio.nite.go.jp/dogan/Top
+            The microbial strain and microbial genomic DNA clones used for the
+            sequencing project are available through the NBRC.
+            URL:http://www.nbrc.nite.go.jp/e/index.html.
+            COMPLETENESS: full length.
+FEATURES             Location/Qualifiers
+     source          1..1669696
+                     /organism="Aeropyrum pernix K1"
+                     /mol_type="genomic DNA"
+                     /strain="K1"
+                     /culture_collection="NBRC:100138"
+                     /db_xref="taxon:272557"
+CONTIG      join(BA000002.3:1..1669696)
+//
+

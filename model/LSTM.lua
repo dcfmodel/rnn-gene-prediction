@@ -1,6 +1,6 @@
 
 local LSTM = {}
-function LSTM.lstm(input_size, rnn_size, n, dropout)
+function LSTM.lstm(input_size, rnn_size, n, dropout, output_size)
   dropout = dropout or 0 
 
   -- there will be 2*n+1 inputs
@@ -54,7 +54,9 @@ function LSTM.lstm(input_size, rnn_size, n, dropout)
   -- set up the decoder
   local top_h = outputs[#outputs]
   if dropout > 0 then top_h = nn.Dropout(dropout)(top_h) end
-  local proj = nn.Linear(rnn_size, input_size)(top_h)
+  --local proj = nn.Linear(rnn_size, input_size)(top_h)
+  -- output_size != input_size for gene_finding application
+  local proj = nn.Linear(rnn_size, output_size)(top_h)
   local logsoft = nn.LogSoftMax()(proj)
   table.insert(outputs, logsoft)
 

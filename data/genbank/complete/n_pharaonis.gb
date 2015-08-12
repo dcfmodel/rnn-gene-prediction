@@ -1,0 +1,65 @@
+LOCUS       NC_007426            2595221 bp    DNA     circular CON 03-AUG-2015
+DEFINITION  Natronomonas pharaonis DSM 2160 complete genome.
+ACCESSION   NC_007426
+VERSION     NC_007426.1  GI:76800655
+DBLINK      BioProject: PRJNA224116
+            BioSample: SAMEA3138222
+            Assembly: GCF_000026045.1
+KEYWORDS    RefSeq; complete genome.
+SOURCE      Natronomonas pharaonis DSM 2160
+  ORGANISM  Natronomonas pharaonis DSM 2160
+            Archaea; Euryarchaeota; Halobacteria; Halobacteriales;
+            Halobacteriaceae; Natronomonas.
+REFERENCE   1
+  AUTHORS   Falb,M., Pfeiffer,F., Palm,P., Rodewald,K., Hickmann,V., Tittor,J.
+            and Oesterhelt,D.
+  TITLE     Living with two extremes: conclusions from the genome sequence of
+            Natronomonas pharaonis
+  JOURNAL   Genome Res. 15 (10), 1336-1343 (2005)
+   PUBMED   16169924
+REFERENCE   2  (bases 1 to 2595221)
+  AUTHORS   Pfeiffer,F.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (28-JAN-2005) Pfeiffer F., Max-Planck-Institute of
+            Biochemistry, Dept. Membrane Biochemistry, Am Klopferspitz 18,
+            D-82152 Martinsried, GERMANY
+COMMENT     REFSEQ INFORMATION: The reference sequence was derived from
+            CR936257.
+            Clone requests: fpf@rzg.mpg.de.
+            Annotation was added by the NCBI Prokaryotic Genome Annotation
+            Pipeline (released 2013). Information about the Pipeline can be
+            found here: http://www.ncbi.nlm.nih.gov/genome/annotation_prok/
+            
+            ##Genome-Annotation-Data-START##
+            Annotation Provider                    :: NCBI
+            Annotation Date                        :: 08/02/2015 01:37:16
+            Annotation Pipeline                    :: NCBI Prokaryotic Genome
+                                                      Annotation Pipeline
+            Annotation Method                      :: Best-placed reference
+                                                      protein set; GeneMarkS+
+            Annotation Software revision           :: 3.0
+            Features Annotated                     :: Gene; CDS; rRNA; tRNA;
+                                                      ncRNA; repeat_region
+            Genes                                  :: 2,799
+            CDS                                       2,714
+            Pseudo Genes                           :: 33
+            CRISPR Arrays                          :: 3
+            rRNAs                                  :: 1, 1, 1 (5S, 16S, 23S)
+            complete rRNAs                         :: 1, 1, 1 (5S, 16S, 23S)
+            tRNAs                                  :: 46
+            ncRNA                                  :: 3
+            Frameshifted Genes                     :: 4
+            Frameshifted Genes On Monomer Runs     :: 0
+            Frameshifted Genes Not On Monomer Runs :: 0
+            ##Genome-Annotation-Data-END##
+            COMPLETENESS: full length.
+FEATURES             Location/Qualifiers
+     source          1..2595221
+                     /organism="Natronomonas pharaonis DSM 2160"
+                     /mol_type="genomic DNA"
+                     /strain="Gabara"
+                     /culture_collection="DSM:2160"
+                     /db_xref="taxon:348780"
+CONTIG      join(CR936257.1:1..2595221)
+//
+
